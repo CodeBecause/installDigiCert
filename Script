@@ -1,0 +1,23 @@
+# Define variables
+$CertPath = "C:\path\to\your\certificate.pfx" # Path to your .pfx file
+$CertPassword = ConvertTo-SecureString "YourPassword" -AsPlainText -Force # Replace 'YourPassword' with your actual password
+$CertStoreLocation = "Cert:\LocalMachine\My" # Target certificate store
+
+try {
+    # Load the certificate
+    $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+    $Certificate.Import($CertPath, $CertPassword, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet)
+
+    # Open the certificate store
+    $CertStore = New-Object System.Security.Cryptography.X509Certificates.X509Store($CertStoreLocation, 'LocalMachine')
+    $CertStore.Open('ReadWrite')
+
+    # Add the certificate to the store
+    $CertStore.Add($Certificate)
+    Write-Host "Certificate successfully installed." -ForegroundColor Green
+
+    # Close the store
+    $CertStore.Close()
+} catch {
+    Write-Host "An error occurred: $_" -ForegroundColor Red
+}
